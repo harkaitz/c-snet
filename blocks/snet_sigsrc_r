@@ -1,0 +1,41 @@
+#!/bin/sh -e
+#h: Usage: $0 OPTIONS
+#h:
+#h: frequency=FREQ :
+#h: rate=RATE      :
+#h: duration=SECS  : Milliseconds to endure, by default infinite.
+#h: format=FORMAT  : Output format, by default 's16le'.
+#h:
+snet_sigsrc_r() {
+    local frequency=5000
+    local rate=44100
+    local duration=
+    local format=s16le
+    if test ! -n "${n1}";then
+        echo "${SCRNAME}: error: Put at least one output node." >&2
+        return 1
+    elif ! which ffmpeg >/dev/null 2>&1;then
+        echo "${SCRNAME}: error: Please install ffmpeg." >&2
+        return 1
+    fi
+    local "$@" sine=
+    if test -n "${frequency}";then
+        local sine="${sine}${sine:+:}frequency=${frequency}"
+    fi
+    if test -n "${duration}";then
+        local sine="${sine}${sine:+:}duration=${duration}"
+    fi
+    ffmpeg -loglevel error -f lavfi -i "sine=${sine}" -f "${format}" -ar "${rate}" pipe:"${n1}"
+}
+if test @"`basename "$0"`" = @"snet_sigsrc_r";then
+    case "$1" in
+        -h|--help)
+            sed -n 's/^ *#h: \{0,1\}//p' "$0" | sed "s|\\\$0|`basename $0`|g"
+            echo ""
+            sed -n 's/^ *#l: \{0,2\}//p' "$0"
+            ;;
+        *)
+            snet_sigsrc_r "$@"
+            ;;
+    esac
+fi

@@ -1,0 +1,39 @@
+#!/bin/sh -e
+#h: Usage: $0 [OPTIONS...]
+#h:
+#h: rate=44100
+#h: channels=1
+#h: samplesize=2
+#h: device=pcm
+
+snet_asink_r() {
+    local rate=44100
+    local channels=1
+    local samplesize=2
+    local device=pcm
+    if test ! -n "${n1}";then
+        echo "${SCRNAME}: error: Put at least one input node." >&2
+        return 1
+    elif ! which mplayer >/dev/null 2>&1;then
+        echo "${SCRNAME}: error: Please install mplayer." >&2
+        return 1
+    fi
+    local "$@"
+    mplayer                                                                    \
+        -demuxer rawaudio                                                      \
+        -rawaudio "rate=${rate}:channels=${channels}:samplesize=${samplesize}" \
+        -ao "${device}"                                                        \
+        - < "/dev/fd/${n1}"
+}
+if test @"`basename "$0"`" = @"snet_asink_r";then
+    case "$1" in
+        -h|--help)
+            sed -n 's/^ *#h: \{0,1\}//p' "$0" | sed "s|\\\$0|`basename $0`|g"
+            echo ""
+            sed -n 's/^ *#l: \{0,2\}//p' "$0"
+            ;;
+        *)
+            snet_asink_r "$@"
+            ;;
+    esac
+fi

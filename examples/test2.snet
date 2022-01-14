@@ -1,0 +1,3 @@
+#!/usr/bin/env snet
+X1 a    @w   snet_sigsrc_r frequency=500 duration=5 rate=8000
+X2 a    @0   snet_asink_r  rate=8000 ${SNET_AUDIO_SINK_ARGS}

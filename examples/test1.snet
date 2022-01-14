@@ -1,0 +1,4 @@
+#!/usr/bin/env snet
+X1 a    @w   echo "bat:Hello world:hiru" >/dev/fd/${n1}
+X2 a b  @rw  cut -d : -f 2 </dev/fd/${n1}
+X2 b    @r   cat </dev/fd/${n1}
