@@ -25,7 +25,8 @@ snet$(EXE): snet.c
 ifneq ($(PREFIX),)
 install: install-license
 install-license: LICENSE
-	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/c-snet
-	cp LICENSE $(DESTDIR)$(PREFIX)/share/doc/c-snet
+	@echo 'I share/doc/c-snet/LICENSE'
+	@mkdir -p $(DESTDIR)$(PREFIX)/share/doc/c-snet
+	@cp LICENSE $(DESTDIR)$(PREFIX)/share/doc/c-snet
 endif
 ## -- license --
