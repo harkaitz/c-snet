@@ -10,23 +10,25 @@ PROGRAMS   =snet$(EXE)
 ##
 all: $(PROGRAMS)
 clean:
-	rm -f $(PROGRAMS)
+	@echo 'D $(PROGRAMS)'
+	@rm -f $(PROGRAMS)
 install: $(PROGRAMS) $(SCRIPTS)
-	install -d $(DESTDIR)$(PREFIX)/bin
-	install -m755 $(PROGRAMS) $(SCRIPTS) $(DESTDIR)$(PREFIX)/bin
-	install -d $(DESTDIR)$(PREFIX)/share/snet/examples
-	cp -r examples/* $(DESTDIR)$(PREFIX)/share/snet/examples
+	@echo 'I bin/ $(not-dir $(PROGRAMS) $(SCRIPTS))'
+	@install -d $(DESTDIR)$(PREFIX)/bin
+	@install -m755 $(PROGRAMS) $(SCRIPTS) $(DESTDIR)$(PREFIX)/bin
+	@echo 'I share/snet/examples/ '
+	@install -d $(DESTDIR)$(PREFIX)/share/snet/examples
+	@cp -r examples/* $(DESTDIR)$(PREFIX)/share/snet/examples
 
 ##
 snet$(EXE): snet.c
-	$(CC) -o $@ $^ $(CFLAGS_ALL) $(LIBS)
+	@echo "B $@ $^"
+	@$(CC) -o $@ $^ $(CFLAGS_ALL) $(LIBS)
 
 ## -- license --
-ifneq ($(PREFIX),)
 install: install-license
 install-license: LICENSE
 	@echo 'I share/doc/c-snet/LICENSE'
 	@mkdir -p $(DESTDIR)$(PREFIX)/share/doc/c-snet
 	@cp LICENSE $(DESTDIR)$(PREFIX)/share/doc/c-snet
-endif
 ## -- license --
