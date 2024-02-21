@@ -1,4 +1,4 @@
-//bin/true && exec hcc "$0" "$@"
+#define _POSIX_C_SOURCE 201000L
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <assert.h>
+#include <strings.h>
 #include <sys/wait.h>
 
 #define SNET_MAX_ITEMS 100
@@ -71,13 +72,13 @@ bool snet_node_open   (snet_node *_n, snet *_snet);
 void snet_node_free   (snet_node *_n);
 void snet_node_close  (snet_node *_n);
 
-#define snet_log(SNET, LEVEL, FORMAT, ...) ({                            \
-            if ((SNET) && (SNET)->file) {                                         \
-                syslog(LEVEL, "%s:%li: " FORMAT, (SNET)->file, (SNET)->line, ##__VA_ARGS__); \
-            } else {                                                    \
-                syslog(LEVEL, FORMAT, ##__VA_ARGS__);                   \
-            }                                                           \
-        })
+#define snet_log(SNET, LEVEL, FORMAT, ...) do {                         \
+      if ((SNET) && (SNET)->file) {                                     \
+         syslog(LEVEL, "%s:%li: " FORMAT, (SNET)->file, (SNET)->line, ##__VA_ARGS__); \
+      } else {                                                          \
+         syslog(LEVEL, FORMAT, ##__VA_ARGS__);                          \
+      }                                                                 \
+   } while(0)
 
 
 struct snet *g_snet = NULL;
@@ -330,7 +331,7 @@ bool snet_item_create(snet_item **_item, snet *_snet, const char _b[]) {
 
     /* Bad loop finals. */
     if (str == NULL || item->pinsz == SNET_MAX_PINS) {
-        snet_log(_snet, LOG_ERR, "Invalid syntax: Missing @ or too much pins.");
+        snet_log(_snet, LOG_ERR, "%s", "Invalid syntax: Missing @ or too much pins.");
         free(item);
         return false;
     }
@@ -338,7 +339,7 @@ bool snet_item_create(snet_item **_item, snet *_snet, const char _b[]) {
     /* Get directions. */
     item->direction = str+1;
     if (strlen(item->direction) < item->pinsz) {
-        snet_log(_snet, LOG_ERR, "Invalid pin count.");
+        snet_log(_snet, LOG_ERR, "%s", "Invalid pin count.");
         free(item);
         return false;
     }
@@ -346,7 +347,7 @@ bool snet_item_create(snet_item **_item, snet *_snet, const char _b[]) {
     /* Save command. */
     item->command = strtok_r(NULL, "\r\n", &t1);
     if (!item->command) {
-        snet_log(_snet, LOG_ERR, "Missing command.");
+        snet_log(_snet, LOG_ERR, "%s", "Missing command.");
         free(item);
         return false;
     }
@@ -434,7 +435,7 @@ void snet_item_child(snet_item *_item, snet *_snet) {
         snet_log(_snet, LOG_DEBUG, "%-10s: %-10s : %s", _item->name, nn, _item->command);
     }
     execl(SHELL, SHELL, "-e", "-c", _item->command, NULL);
-    snet_log(_snet, LOG_ERR, "Can't execute.");
+    snet_log(_snet, LOG_ERR, "%s", "Can't execute.");
     exit(1);
 }
 
