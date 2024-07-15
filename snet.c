@@ -11,7 +11,6 @@
 #include <assert.h>
 #include <strings.h>
 #include <sys/wait.h>
-
 #define SNET_MAX_ITEMS 100
 #define SNET_MAX_NODES 30
 #define SNET_MAX_PINS  10
